@@ -1,5 +1,6 @@
 version: 0.2
 env:
+  shell: bash
   git-credential-helper: yes
 phases:
   install:
@@ -42,3 +43,6 @@ phases:
       - cd ..
       - git config --global user.email "lukemwila.tech@gmail.com"
       - git config --global user.name "LukeMwila"
+      - git add . 
+      - git commit -m "refactor - updated dev container image tag to $CONTAINER_IMAGE_TAG"
+      - git push -u origin develop

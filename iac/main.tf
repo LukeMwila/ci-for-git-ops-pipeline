@@ -20,7 +20,6 @@ data "aws_secretsmanager_secret_version" "docker_creds" {
 module "backend_pipeline" {
   source = "./backend_pipeline"
   application_name = var.application_name
-  s3_bucket_destination = "${var.application_name}-${var.environment}"
   pipeline_bucket_name = "${var.application_name}-codepipeline"
   codebuild_bucket_name = "${var.application_name}-codebuild"
   github_org = "LukeMwila"
