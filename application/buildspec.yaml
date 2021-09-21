@@ -12,7 +12,7 @@ phases:
       # Install kustomize
       - echo Install kustomize...
       - curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-      - kustomize version
+      - ./kustomize version
       - echo "Change directory..."
       - cd application
       - echo "Installing dependancies..."
