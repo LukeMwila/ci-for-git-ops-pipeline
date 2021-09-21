@@ -1,0 +1,44 @@
+version: 0.2
+env:
+  git-credential-helper: yes
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+      nodejs: 12
+  pre_build:
+    commands:
+      # Install kustomize
+      - echo Install kustomize...
+      - curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+      - kustomize version
+      - echo "Change directory..."
+      - cd application
+      - echo "Installing dependancies..."
+      - npm install 
+  build:
+    commands:
+      - echo Build started on `date`
+      # Run test
+      - echo Run node.js tests...
+      - npm run test
+      # Get application version 
+      - CONTAINER_IMAGE_TAG="$(node -e "console.log(require('./package.json').version);")"
+      # Build the Docker images
+      - echo Building the Docker image...
+      - docker build -t lukondefmwila/express-test:$CONTAINER_IMAGE_TAG .
+      # Log in to the Docker CLI
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  post_build:
+    commands:
+      # Update K8s manifest with new image tag
+      # Redirect to kustomize folder
+      - cd ../kustomize 
+      - ./execute-kustomize-dev.sh
+      # Push the image to Docker hub
+      - echo Pushing the Docker image...
+      # - docker push lukondefmwila/dkr-multicontainer-app-client
+      # Push local changes to remote repo
+      - cd ..
+      - git config --global user.email "lukemwila.tech@gmail.com"
+      - git config --global user.name "LukeMwila"
