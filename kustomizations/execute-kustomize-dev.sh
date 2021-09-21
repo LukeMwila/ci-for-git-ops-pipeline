@@ -8,6 +8,6 @@ CONTAINER_IMAGE_TAG="$(node -e "console.log(require('../application/package.json
 echo 'Container image tag updated in kustomize overlay for dev...'
 echo 'Creating new deployment manifest file...'
 
-../kustomize build overlays/dev > ../k8s-manifests/deployment.yaml
+../../kustomize build overlays/dev > ../k8s-manifests/deployment.yaml
 
 echo 'Updated the deployment manifest file being watched by GitOps tool...'
