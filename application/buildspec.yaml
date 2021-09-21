@@ -34,7 +34,7 @@ phases:
     commands:
       # Update K8s manifest with new image tag
       # Redirect to kustomize folder
-      - cd ../kustomize 
+      - cd ../kustomizations 
       - ./execute-kustomize-dev.sh
       # Push the image to Docker hub
       - echo Pushing the Docker image...
