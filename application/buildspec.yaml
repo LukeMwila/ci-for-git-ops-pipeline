@@ -44,7 +44,7 @@ phases:
     commands:
       # Push the image to Docker hub
       - echo Pushing the Docker image...
-      # - docker push lukondefmwila/dkr-multicontainer-app-client
+      - docker push lukondefmwila/express-test:$CONTAINER_IMAGE_TAG
       # Push local changes to remote repo
       - echo "Create temporary folder to clone the repo into..."
       - TEMP_FOLDER="$(mktemp -d)"
