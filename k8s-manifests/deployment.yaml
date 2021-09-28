@@ -16,7 +16,7 @@ spec:
         role: express-api
     spec:
       containers:
-      - image: lukondefmwila/express-test:1.0.0
+      - image: lukondefmwila/express-test:1.0.1
         name: express-api
         ports:
         - containerPort: 8080
