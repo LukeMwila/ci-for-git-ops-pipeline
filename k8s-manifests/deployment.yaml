@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-api
+  namespace: express-nodejs
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: express-api
+      role: express-api
+  template:
+    metadata:
+      labels:
+        app: express-api
+        role: express-api
+    spec:
+      containers:
+      - image: lukondefmwila/express-test:1.0.0
+        name: express-api
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi

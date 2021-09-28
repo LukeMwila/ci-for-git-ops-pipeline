@@ -3,4 +3,4 @@ bases:
 images:
   - name: lukondefmwila/express-test
     newName: lukondefmwila/express-test
-    newTag: latest
+    newTag: 1.0.0
