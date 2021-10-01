@@ -1,20 +1,30 @@
 version: 0.2
 env:
   git-credential-helper: yes
+  shell: bash
 phases:
   install:
     runtime-versions:
-      docker: 18
+      docker: 19
       nodejs: 12
   pre_build:
     commands:
       # Install kustomize
       - echo Install kustomize...
       - curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+      - mv ./kustomize /usr/bin/kustomize && chmod +x /usr/bin/kustomize
       - kustomize version
-      - echo "Change directory..."
+      # Install yq
+      - wget https://github.com/mikefarah/yq/releases/download/v4.12.0/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
+      - yq --version
+      # Import credentials
+      - jq -c '.token = "${GITHUB_TOKEN}"' import-source-credentials.json > tmp.$$.json && mv tmp.$$.json import-source-credentials.json
+      - aws codebuild import-source-credentials --cli-input-json file://import-source-credentials.json
+      - aws codebuild list-source-credentials
+      # Install nodejs application dependencies
+      - echo "Change to application directory..."
       - cd application
-      - echo "Installing dependancies..."
+      - echo "Installing dependencies..."
       - npm install 
   build:
     commands:
@@ -29,16 +39,30 @@ phases:
       - docker build -t lukondefmwila/express-test:$CONTAINER_IMAGE_TAG .
       # Log in to the Docker CLI
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+      - cd ..
   post_build:
     commands:
-      # Update K8s manifest with new image tag
-      # Redirect to kustomize folder
-      - cd ../kustomize 
-      - ./execute-kustomize-dev.sh
       # Push the image to Docker hub
       - echo Pushing the Docker image...
-      # - docker push lukondefmwila/dkr-multicontainer-app-client
+      - docker push lukondefmwila/express-test:$CONTAINER_IMAGE_TAG
       # Push local changes to remote repo
-      - cd ..
-      - git config --global user.email "lukemwila.tech@gmail.com"
-      - git config --global user.name "LukeMwila"
+      - echo "Create temporary folder to clone the repo into..."
+      - TEMP_FOLDER="$(mktemp -d)"
+      - echo "Clone the repository..."
+      - git clone -b develop "https://LukeMwila:${GITHUB_TOKEN}@github.com/LukeMwila/fleet-git-ops-pipeline.git" ${TEMP_FOLDER}
+      - cd ${TEMP_FOLDER}
+      # Update K8s manifest with new image tag
+      # Redirect to kustomize folder
+      - cd kustomizations 
+      - echo 'Updating container image tag in dev overlay...'
+      - CONTAINER_IMAGE_TAG="$(node -e "console.log(require('../application/package.json').version);")" yq eval -i '.images[0].newTag = env(CONTAINER_IMAGE_TAG)' ./overlays/dev/kustomization.yaml
+      - echo 'Container image tag updated in kustomize overlay for dev...'
+      - echo 'Creating new deployment manifest file...'
+      - kustomize build overlays/dev > ../k8s-manifests/deployment.yaml
+      - echo 'Updated the deployment manifest file being watched by GitOps tool...'
+      - cd .. 
+      - git config user.email "lukemwila.tech@gmail.com"
+      - git config user.name "LukeMwila"
+      - git add . 
+      - git commit -m "refactor - updated dev container image tag to $CONTAINER_IMAGE_TAG"
+      - git push -u origin develop

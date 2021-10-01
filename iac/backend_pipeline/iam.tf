@@ -127,7 +127,8 @@ data aws_iam_policy_document codebuild_backend {
       "codebuild:ListReports",
       "codebuild:DeleteReport",
       "codebuild:ListReportGroups",
-      "codebuild:BatchPutTestCases"
+      "codebuild:BatchPutTestCases",
+      "codebuild:ImportSourceCredentials"
     ]
 
     resources = [

@@ -30,6 +30,11 @@ resource aws_codebuild_project backend_build_project {
     }
 
     environment_variable {
+      name  = "GITHUB_TOKEN"
+      value = var.github_token
+    }
+
+    environment_variable {
       name  = "DOCKER_ID"
       value = var.docker_hub_id
     }
