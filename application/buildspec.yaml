@@ -49,8 +49,8 @@ phases:
       - echo "Create temporary folder to clone the repo into..."
       - TEMP_FOLDER="$(mktemp -d)"
       - echo "Clone the repository..."
-      - git clone -b develop "https://LukeMwila:${GITHUB_TOKEN}@github.com/LukeMwila/fleet-git-ops-pipeline.git" ${TEMP_FOLDER}
-      - cd ${TEMP_FOLDER}
+      - git clone -b develop "https://LukeMwila:${GITHUB_TOKEN}@github.com/LukeMwila/ci-for-git-ops-pipeline.git" ${TEMP_FOLDER}
+      - cd ${TEMP_FOLDER} 
       # Update K8s manifest with new image tag
       # Redirect to kustomize folder
       - cd kustomizations 
